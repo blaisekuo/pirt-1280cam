@@ -7,15 +7,16 @@ Created on Thu May 31 21:01:35 2018
 
 import matplotlib.pyplot as plt  
 import numpy as np
+import struct as st
 #import pandas as pd  
 #import os
 
     
 #wind path
-#datastore_path="c:/users/45027374/cloudstor/datastore/SPIE2018/"
+datastore_path="c:/users/45027374/cloudstor/datastore/SPIE2018/"
 
 #mac path
-datastore_path="/Users/wapr/PhD/datastore/SPIE2018/"
+#datastore_path="/Users/wapr/PhD/datastore/SPIE2018/"
 
     
 run_dir="Run4-20180531-photon-noise-neg40c/raw/"
@@ -43,8 +44,12 @@ def read_header():
     'Hour':int.from_bytes([data[18],data[19]],byteorder='little'),
     'Minute':int.from_bytes([data[20],data[21]],byteorder='little'),
     'Second':int.from_bytes([data[22],data[23]],byteorder='little'),
-    'IntensityCold':int.from_bytes([data[24],data[25]],byteorder='little',signed='true')
+    'IntensityCold':int.from_bytes([data[24],data[25]],byteorder='little',signed='true'),
+    #'TemperatureCold':st.unpack('<f',''.join([data[26],data[27],data[28],data[29]]))
     }
+    
+    #print(bytes(data[26]))
+    #print(bytes(data[27]))
     
     print(header)
     
@@ -68,4 +73,4 @@ def read_pixels():
     
 
 read_header()
-#read_pixels()
+read_pixels()
