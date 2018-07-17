@@ -23,7 +23,8 @@ datastore_path="c:/cloudstor/datastore/SPIE2018/"
 #run_dir="Run4-20180531-photon-noise-neg40c/"
 #run_dir="Run5-20180602-neg40c/"
 #run_dir="Run6-20180602-neg20c/"
-run_dir="Run8-20180713-neg60c/"
+#run_dir="Run8-20180713-neg60c/"
+run_dir="Run9-20180713-photon-noise-neg60c/"
 
 def open_file(file):
     
