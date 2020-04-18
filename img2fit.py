@@ -11,9 +11,13 @@ from astropy.io import fits
 #import pandas as pd  
 import os
 
-    
+import argparse
+
+
+
 #wind path
-datastore_path="c:/cloudstor/datastore/SPIE2018/"
+#datastore_path="c:/cloudstor/datastore/SPIE2018/"
+
 
 
 #mac path
@@ -24,12 +28,29 @@ datastore_path="c:/cloudstor/datastore/SPIE2018/"
 #run_dir="Run5-20180602-neg40c/"
 #run_dir="Run6-20180602-neg20c/"
 #run_dir="Run8-20180713-neg60c/"
-run_dir="Run9-20180713-photon-noise-neg60c/"
+#run_dir="Run9-20180713-photon-noise-neg60c/"
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Convert Princeton IR Tech 1280 Scicam raw img files into fits')
+    
+
+    parser.add_argument('-p','--path', type=dir_path, help='path of the raw img files')
+
+    return parser.parse_args()
+
+
+def dir_path(path):
+    if os.path.isdir(path):
+        return path
+    else:
+        raise argparse.ArgumentTypeError(f"readable_dir:{path} is not a valid path")
+
+
 
 def open_file(file):
     
         
-    with open(datastore_path + run_dir + file, "rb") as binary_file:
+    with open(file, "rb") as binary_file:
         # Read the whole file at once
         data = binary_file.read()
         
@@ -86,90 +107,39 @@ def read_pixels(data):
     
     return i2d
     
-#    plt.imshow(i2d,cmap='gray',origin='lower')
-#    plt.savefig(datastore_path + run_dir + file + ".png", bbox_inches="tight")
-    
-    
+def main():
 
-#filebase = "1ms0000.img"
+    parsed_args = parse_arguments()
 
-imgar = []
+    datastore_path = parsed_args.path
 
-if "20c" in run_dir:
-    hdubias = fits.open(datastore_path + '20c-bias.fits')
-    print("using 20c bias file")
-elif "60c" in run_dir:
-    hdubias = fits.open(datastore_path + '60c-bias.fits')
-    print("using 60c bias file")
-else:
-    hdubias = fits.open(datastore_path + 'bias.fits')
-    print("using 40c bias file")
+    imgar = []
 
-biasin = hdubias[0].data
-
-print(biasin.shape)
-
-vec = np.full((1024,1280),16384)
-
-
-x=0
+    x=0
  
-#for x in range (0,20):
- #   datain=open_file('raw/1ms00' + '%02d' % (x,) + '.img')
-  #  #read_header(datain)
-   # oneimgar=read_pixels(datain)
-
-#files = []
-for onefile in  os.listdir(datastore_path + run_dir + 'raw/'):
-    if onefile.endswith("img"):
-    #files.append(onefile)
     
-        print(onefile)
 
-#for x in range (0,20):
-        datain=open_file('raw/' + onefile)
-        #read_header(datain)
-        oneimgar=read_pixels(datain)
+    for onefile in  os.listdir(datastore_path):
+        if onefile.endswith("img"):
+        #files.append(onefile)
+    
+            print(os.path.join(datastore_path,onefile))
+
+    #for x in range (0,20):
+            datain=open_file(os.path.join(datastore_path,onefile))
+            #read_header(datain)
+            oneimgar=read_pixels(datain)
     
     
-        offsetimgar = oneimgar + vec
-    
-        biasoneimgar = offsetimgar - biasin
-        
-        
-        hdu = fits.PrimaryHDU(biasoneimgar)
-        hdulist = fits.HDUList([hdu])
-        hdulist.writeto(datastore_path + run_dir + 'fits/' + onefile + '-subbias.fits')
-        hdulist.close()
-    
-        hdu = fits.PrimaryHDU(offsetimgar)
-        hdulist = fits.HDUList([hdu])
-        hdulist.writeto(datastore_path + run_dir + 'fits/' + onefile + '-plus2sup14.fits')
-        hdulist.close()
 
-        hdu = fits.PrimaryHDU(oneimgar)
-        hdulist = fits.HDUList([hdu])
-        hdulist.writeto(datastore_path + run_dir + 'fits/' + onefile + '.fits')
-        hdulist.close()
+            hdu = fits.PrimaryHDU(oneimgar)
+            hdulist = fits.HDUList([hdu])
+            hdulist.writeto(os.path.join(datastore_path,onefile) + '.fits')
+            hdulist.close()
 
-# calculate bias
-    
- #   imgar.append(oneimgar)
+def maintest():
+    parsed_args = parse_arguments()
+    print(os.listdir(parsed_args.path))
 
-#imgar= np.asarray(imgar)
-
-#bias=np.mean(imgar,axis=0)
-
-#print(bias.astype(int))
-
-#print(bias.shape)
-
-#hdu = fits.PrimaryHDU(bias.astype(int))
-#hdulist = fits.HDUList([hdu])
-#hdulist.writeto(datastore_path + run_dir + 'bias' + '.fits')
-#hdulist.close()
-
-
-####
-
-#plt.imshow(bias,cmap='gray',origin='lower')    
+if __name__ =="__main__":
+    main()
