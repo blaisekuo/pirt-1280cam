@@ -12,6 +12,7 @@ from astropy.io import fits
 import os
 
 import argparse
+import sys
 
 
 
@@ -30,9 +31,18 @@ import argparse
 #run_dir="Run8-20180713-neg60c/"
 #run_dir="Run9-20180713-photon-noise-neg60c/"
 
+class MyParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(2)
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Convert Princeton IR Tech 1280 Scicam raw img files into fits')
     
+    if len(sys.argv)==1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     parser.add_argument('-p','--path', type=dir_path, help='path of the raw img files')
 
